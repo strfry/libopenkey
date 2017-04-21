@@ -3,6 +3,7 @@
 # the 'bin_' indicates that these build products will be installed
 # in the $(bindir) directory. For example /usr/bin
 #bin_PROGRAMS=run_bootstrap
+bin_PROGRAMS=openkey_slim_login
 
 # Because a.out is only a sample program we don't want it to be installed.
 # The 'noinst_' prefix indicates that the following targets are not to be
@@ -20,10 +21,14 @@ run_bootstrap_SOURCES= run_bootstrap.c
 make_card_SOURCES = make_card.c
 own_card_SOURCES = own_card.c
 authenticate_card_SOURCES = authenticate_card.c
+openkey_slim_login_SOURCES = openkey_slim_login.c
 
 # Linker options for a.out
 AM_LDFLAGS = $(top_srcdir)/libopenkey/libopenkey.la
 LDADD = $(DEPS_LIBS)
+
+openkey_slim_login_LDFLAGS = -lxdo $(AM_LDFLAGS)
+
 
 # Compiler options for a.out
 AM_CPPFLAGS = -I$(top_srcdir)/include $(DEPS_CFLAGS)

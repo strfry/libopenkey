@@ -66,13 +66,6 @@ int find_user(const char* card_id, char** username)
 			continue;
 		}
 
-		/*
-		if((strncasecmp(s->username, line, colonpos-line) != 0 || strlen(s->username) != colonpos-line) ) {
-			D_DBG("Username '%s' doesn't match line '%s', ignored", s->username, line);
-			continue;
-		}
-		* */
-
 		if(strlen(colonpos) < strlen(card_id) + 1 + 1) { // Account for colon and newline character
 			D_DBG("Token in line '%s' is shorter than presented token, ignored", line);
 			continue;
@@ -82,10 +75,6 @@ int find_user(const char* card_id, char** username)
 			D_DBG("Token '%s' matched line '%s', succeeded", card_id, line);
 			*username = strdup(line);
 			*strchr(*username, ':') = 0;
-			//strncpy(username, line, colonpos-line);
-			//username[colonpos-line] = 0;
-			//pam_set_item(pamh, PAM_USER, username);
-			// retval = PAM_SUCCESS;
 			break;
 		}
 	}
@@ -101,24 +90,6 @@ abort:
 
 	return retval;
 }
-/*
-	FILE* file = fopen(, "rb");
-			size_t read;
-			char* line = 0;
-			size_t len = 0;
-			while ((read = getline(&line, &len, file)) >= 0) {
-				char *colonpos = strchr(line, ':');
-				if (strncasecmp(card_id, colonpos+1, strlen(card_id)) == 0) { // Ignore trailing garbage, f.e. white space
-					char username[256];
-					strncpy(username, line, colonpos-line);
-					username[colonpos-line] = 0;
-					printf("Identified user %s\n", username);
-					break;
-				}
-			}
-			fclose(file);
-
-}*/
 
 static void login_username(char* username)
 {
@@ -129,9 +100,7 @@ static void login_username(char* username)
 		return;
 	}
 	xdo_enter_text_window(xdo, CURRENTWINDOW, username, 12000);
-	//sleep(1);
-	xdo_send_keysequence_window(xdo, CURRENTWINDOW, "Return", 12000000);
-
+	xdo_send_keysequence_window(xdo, CURRENTWINDOW, "Return", 12000);
 	xdo_free(xdo);
 }
 
@@ -207,10 +176,11 @@ int main(int argc, char **argv) {
 	if(username) {
 		login_username(username);
 		free(username);
+		sleep(2); // Give PAM Module enough to access the reader
 	} else {
 		fprintf(stderr, "No Mifare DESfire tags found\n");
 		return 1;
-	}	
-	
+	}
+
 	return 0;
 }
